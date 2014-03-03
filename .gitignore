@@ -1,0 +1,5 @@
+config-debug
+debug.js
+debug.pid
+databases/
+node_modules/

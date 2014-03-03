@@ -1,0 +1,16 @@
+default-ip         : 0.0.0.0
+default-port       : 3000
+
+name               : autoNode.js
+version            : 0.5
+secret             : your-secret-key
+author             : Kai Wegner - see http://github.com/kai-wegner/AutoNode
+
+autoNode.registerTo.0   : yourAndroidDeviceID
+
+autoRemote.name     : autoRemote.js
+autoRemote.keyFile  : ~/AutoNode/server.key
+autoRemote.interfaces.public.hostname : localhost
+autoRemote.interfaces.public.port     : 3000
+autoRemote.interfaces.local.interface : lo
+autoRemote.interfaces.local.port      : 3000

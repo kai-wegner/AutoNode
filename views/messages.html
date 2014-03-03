@@ -1,0 +1,119 @@
+@{meta('title', 'description', 'keywords')}
+
+<a href="/">&lt; AutoNode</a> - Your messages
+
+<div class="spacer"></div>
+<table id="list"><tr><td></td></tr></table>
+<div id="pager"></div>
+
+<button id="deleteSelected">Delete selected</button>
+
+<script type="text/javascript">
+jQuery.jgrid.no_legacy_api = true;
+
+
+$(function () {
+  function checkBoxCreator(value, options) {
+    console.log(options);
+    console.log(value);
+
+    var el = document.createElement("input");
+    el.type="checkbox";
+    el.value = value;
+
+    return el;
+  };
+  function checkBoxValueCreator(elem, operation, value) {
+    if(operation === 'get') {
+       return $(elem).val();
+    } else if(operation === 'set') {
+       $('input',elem).val(value);
+    }
+  };
+
+  $("#list").jqGrid({
+    url: "/messages/list",
+    datatype: "json",
+    mtype: "GET",
+    colNames: ["ID","Message", "Sender", "Direction", "Type", "Last Modified",
+                "Received"],
+    multiselect:true,
+    colModel: [
+        { name:'id',
+          index:'id',
+          width:30,
+          hidden:true,
+          align: "center",
+          sortable:false
+        },
+        { name: "content", width: 150, sortable:false },
+        { name: "sender", width: 80,align: "center" },
+        { name: "direction", width: 60,align: "center" },
+        { name: "type", width: 60, align: "center" },
+        { name: "updated_at", width: 110, sorttype:"date",
+          formatter:"date",
+          align: "center" },
+        { name: "received", width: 110, sorttype:"date", formatter:"date",
+          formatoptions : {
+            srcformat : 'Y-m-d H:i:s',
+            newformat : 'Y-m-d H:i:s'
+          },
+          align: "center"
+        }
+    ],
+    pager: "#pager",
+    rowNum: 10,
+    rowList: [10, 20, 30],
+    sortname: "received",
+    sortorder: "desc",
+    viewrecords: true,
+    gridview: true,
+    autoencode: true,
+    caption: "AutoNode Messages"
+  });
+  $("#deleteSelected").click(function(event) {
+    $.ajax({
+      type: 'POST',
+      url: '/messages/delete',
+      data: {
+        delete: $("#list").getGridParam('selarrrow')
+      },
+      success: function(server) {
+        console.log("success")
+      },
+      dataType: 'json'
+    });
+
+    $("#list").trigger('reloadGrid');
+  });
+});
+</script>
+
+<script type="text/javascript">
+
+  var socket = null;
+
+  $(document).ready(function() {
+
+    function connect() {
+
+      if (socket !== null)
+        return;
+
+      socket = new WebSocket('ws://127.0.0.1:3000/');
+
+      socket.onopen = function() {
+          console.log('open');
+      };
+
+      socket.onmessage = function(e) {
+        $("#list").trigger('reloadGrid');
+      };
+
+      socket.onclose = function() {
+          console.log('close');
+      };
+    }
+    connect();
+  });
+</script>

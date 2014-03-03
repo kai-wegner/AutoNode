@@ -1,0 +1,12 @@
+@#auto-vendor-prefix#@
+
+@constant{ color:#505050 }
+@function(property){ color:@property }
+
+body { padding:20px; margin:0; font:normal 12px Arial; @constant; }
+div { @function('red'); }
+
+.spacer {
+  margin-top:10px;
+  padding-top:10px;
+}
