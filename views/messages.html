@@ -100,10 +100,10 @@ $(function () {
       if (socket !== null)
         return;
 
-      socket = new WebSocket('ws://127.0.0.1:3000/');
+      socket = new WebSocket('@{model.webSocketURL_client}');
 
       socket.onopen = function() {
-          console.log('open');
+          console.log('connected to @{model.webSocketURL_client}');
       };
 
       socket.onmessage = function(e) {

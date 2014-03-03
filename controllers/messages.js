@@ -53,7 +53,7 @@ exports.functions = {
 function renderMessages() {
   var self = this;
 
-  self.view('messages');
+  self.view('messages',{webSocketURL_client:framework.config.webSocketURL_client});
 }
 
 var socket;
