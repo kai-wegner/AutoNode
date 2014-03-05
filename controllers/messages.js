@@ -1,6 +1,6 @@
 var plugins     = require('../lib/plugins'),
     config2json = require('../lib/config2json'),
-    arcomm      = require('autoRemote.js');
+    arcomm      = require('autoremote.js');
 
 exports.install = function(framework) {
   var self = this;
