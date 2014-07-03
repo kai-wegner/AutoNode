@@ -1,5 +1,6 @@
 exports.install = function(framework) {
-    framework.route('/', view_homepage,['get']);
+    framework.route('/', processMessage, ['json']);
+    framework.route('/', view_homepage, ['get']);
     framework.route('#400', error400);
     framework.route('#401', error401);
     framework.route('#403', error403);
@@ -11,6 +12,7 @@ exports.install = function(framework) {
 
 // Bad Request
 function error400() {
+    console.log("Error 400");  
     var self = this;
     self.status = 400;
     self.plain(utils.httpStatus(self.status));
@@ -61,10 +63,18 @@ function error500() {
 function view_homepage() {
     var self = this;
 
-    var messages = self.functions('messages');
+    console.log("Processing homepage");    
+    var messages = self.functions('messages');
 
-    if(self.get.message != null || self.post.message != null)
+    if (self.get.message != null || self.post.message != null)
         messages.processMessage(self);
     else
         self.view('homepage');
+}
+
+function processMessage() {
+
+    console.log("Processing message");   
+    var messages = this.functions('messages'); 
+    messages.processMessage(this);
 }
