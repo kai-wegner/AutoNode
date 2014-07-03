@@ -1,111 +1,122 @@
-var plugins     = require('../lib/plugins'),
+var plugins = require('../lib/plugins'),
     config2json = require('../lib/config2json'),
-    arcomm      = require('autoremote.js');
+    arcomm = require('autoremote.js');
 
 exports.install = function(framework) {
-  var self = this;
+    var self = this;
 
-  framework.route('/messages', renderMessages);
-  framework.route('/messages/list', listMessages, ['+xhr']);
-  framework.route('/messages/delete', deleteMessages, ['post']);
-  framework.websocket('/', messageSocket, ['json']);
+    framework.route('/messages', renderMessages);
+    framework.route('/messages/list', listMessages, ['+xhr']);
+    framework.route('/messages/delete', deleteMessages, ['post']);
+    framework.websocket('/', messageSocket, ['json']);
 
-  arcomm.setConfig(config2json.parseConfig('autoRemote',framework.config));
+    arcomm.setConfig(config2json.parseConfig('autoRemote', framework.config));
 
-  framework.autoNode = config2json.parseConfig('autoNode',framework.config).autoNode;
+    framework.autoNode = config2json.parseConfig('autoNode', framework.config).autoNode;
 
-  for(var i=0; i < framework.autoNode.registerTo.length;i++)
-    arcomm.registerServerToDevice(null,{key:framework.autoNode.registerTo[i]});
+    for (var i = 0; i < framework.autoNode.registerTo.length; i++)
+        arcomm.registerServerToDevice(null, {
+            key: framework.autoNode.registerTo[i]
+        });
 
-  plugins.init(
-    {
-      autoRemote:arcomm,
-      registeredDevices:framework.autoNode.registerTo,
-      framework:framework
+    plugins.init({
+        autoRemote: arcomm,
+        registeredDevices: framework.autoNode.registerTo,
+        framework: framework
     });
 
 };
 
 exports.functions = {
-  processMessage: function(controller) {
-    var message = controller.post.message || controller.get.message;
-    var sender = controller.post.sender != null ? controller.post.sender : "-not available-";
+    processMessage: function(controller) {
+        var message = controller.post;
+        console.log(message);
+        var communicationAutoRemote = arcomm.getCommunicationFromPayload(message);
 
-    var pluginMessage = {
-      query:controller.post,
-      request:controller.req,
-      message:message,
-      sender:sender,
-      callchain:[],
-      responses:[],
-      framework:controller,
-      socket:socket
+        var response = communicationAutoRemote.executeRequest();
+
+        var pluginMessage = {
+            query: controller.post,
+            request: controller.req,
+            message: communicationAutoRemote.message,
+            sender: message.sender,
+            callchain: [],
+            responses: [],
+            framework: controller,
+            socket: socket
+        }
+
+        plugins.notify("newMessage", pluginMessage);
+
+        plugins.notify("done", pluginMessage);
+
+        var responseText = JSON.stringify(response);
+        console.log("Response: " + responseText);
+        controller.plain(response);
     }
-
-    plugins.notify("newMessage",pluginMessage);
-
-    plugins.notify("done",pluginMessage);
-
-    controller.plain('OK');
-  }
 };
 
 function renderMessages() {
-  var self = this;
+    var self = this;
 
-  self.view('messages',{webSocketURL_client:framework.config.webSocketURL_client});
+    self.view('messages', {
+        webSocketURL_client: framework.config.webSocketURL_client
+    });
 }
 
 var socket;
+
 function messageSocket() {
-  var controller = this;
-  socket = controller;
+    var controller = this;
+    socket = controller;
 
-  controller.on('open', function(client) {
-    console.log('Connect / Online:', controller.online);
-  });
+    controller.on('open', function(client) {
+        console.log('Connect / Online:', controller.online);
+    });
 
-  controller.on('close', function(client) {
-    console.log('Disconnect / Online:', controller.online);
-  });
+    controller.on('close', function(client) {
+        console.log('Disconnect / Online:', controller.online);
+    });
 
-  controller.on('error', function(error, client) {
-    framework.error(error, 'websocket', controller.uri);
-  });
+    controller.on('error', function(error, client) {
+        framework.error(error, 'websocket', controller.uri);
+    });
 }
 
 function listMessages() {
-  var self = this;
-  var db = framework.database('messages');
+    var self = this;
+    var db = framework.database('messages');
 
-  var sortProperty = self.get.sidx;
-  var sortDesc = self.get.sord === 'desc';
+    var sortProperty = self.get.sidx;
+    var sortDesc = self.get.sord === 'desc';
 
-  db.all(function(messages) {
+    db.all(function(messages) {
 
-    messages.sort(function(a, b){
-      var dateA=new Date(a[sortProperty]),
-          dateB=new Date(b[sortProperty]);
-      if(!sortDesc)
-        return dateA-dateB;
-      else
-        return dateB-dateA;
+        messages.sort(function(a, b) {
+            var dateA = new Date(a[sortProperty]),
+                dateB = new Date(b[sortProperty]);
+            if (!sortDesc)
+                return dateA - dateB;
+            else
+                return dateB - dateA;
+        });
+
+        self.json(messages);
     });
-
-    self.json(messages);
-  });
 }
 
 function deleteMessages() {
-  var self = this;
-  var db = framework.database('messages');
-  var delObjects = self.post["delete[]"];
+    var self = this;
+    var db = framework.database('messages');
+    var delObjects = self.post["delete[]"];
 
-  var filter = function(doc) {
-    return delObjects.indexOf(doc.id) !== -1;
-  };
+    var filter = function(doc) {
+        return delObjects.indexOf(doc.id) !== -1;
+    };
 
-  db.remove(filter, function(){
-    self.json({response:"ok"});
-  });
+    db.remove(filter, function() {
+        self.json({
+            response: "ok"
+        });
+    });
 }
