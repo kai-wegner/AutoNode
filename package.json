@@ -1,7 +1,7 @@
 {
   "name": "AutoNode",
   "description": "A cross-plattform AutoRemote-Server based on node.js",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "private": false,
   "author": "Kai Wegner",
   "repository": {
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "total.js": "~1.2.x",
-    "autoremote.js": "~0.5.x"
+    "autoremote.js": "~0.6.x"
   },
   "devDependencies": {
   }
