@@ -18,7 +18,7 @@ var processCommunication = function(event, funcGetContent) {
     var communication = event.message;
     var newMessage = event.framework.model('message').new();
     newMessage.content = funcGetContent(communication);
-    newMessage.sender = communication.sender;
+    newMessage.sender = communication.device != null ? communication.device.name : communication.sender;
     newMessage.type = communication.getCommunicationType();
     db.insert(newMessage);
 

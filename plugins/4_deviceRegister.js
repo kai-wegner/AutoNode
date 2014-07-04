@@ -36,7 +36,12 @@ exports.newRequestSendRegistration = function(event) {
     newDevice.port = communication.port;
     newDevice.haswifi = communication.haswifi;
     newDevice.additional = communication.additional;
-    db.insert(newDevice);
-    console.log("Inserted new device: ");
-    console.log(newDevice);
+    db.remove(function(device) {
+        return device.id == newDevice.id;
+    }, function() {
+
+        db.insert(newDevice);
+        console.log("Inserted new device: ");
+        console.log(newDevice);
+    });
 };
