@@ -16,8 +16,8 @@ exports.init = function(configuration) {
 
 
 exports.newMessage = function(event) {
-    if (event.message.indexOf('$:') == 0) {
-        var command = event.message.substring(2);
+    if (event.message.message.indexOf('$:') == 0) {
+        var command = event.message.message.substring(2);
         var registeredDevices = this.registeredDevices;
         var autoRemote = this.autoRemote;
 
@@ -28,11 +28,10 @@ exports.newMessage = function(event) {
                 console.log('exec error: ' + error);
                 response = error;
             }
+            autoRemote.sendMessageToDevice({
+                key: event.message.sender
+            }, response);
 
-            for (var i = 0; i < registeredDevices.length; i++)
-                autoRemote.sendMessageToDevice({
-                    key: registeredDevices[i]
-                }, response);
 
         });
     }

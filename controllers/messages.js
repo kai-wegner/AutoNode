@@ -29,29 +29,29 @@ exports.install = function(framework) {
 
 exports.functions = {
     processMessage: function(controller) {
-        var message = controller.post;
-        console.log(message);
-        var communicationAutoRemote = arcomm.getCommunicationFromPayload(message);
+        var communicationAutoRemote = arcomm.getCommunicationFromPayload(controller.post);
 
         var response = communicationAutoRemote.executeRequest();
 
         var pluginMessage = {
             query: controller.post,
             request: controller.req,
-            message: communicationAutoRemote.message,
-            sender: message.sender,
+            message: communicationAutoRemote,
+            sender: communicationAutoRemote.sender,
             callchain: [],
             responses: [],
             framework: controller,
             socket: socket
         }
 
-        plugins.notify("newMessage", pluginMessage);
+        var eventType = "new" + communicationAutoRemote.getCommunicationType();
+
+        console.log("Notifying plugins of event " + eventType);
+        plugins.notify(eventType, pluginMessage);
 
         plugins.notify("done", pluginMessage);
 
         var responseText = JSON.stringify(response);
-        console.log("Response: " + responseText);
         controller.plain(response);
     }
 };
