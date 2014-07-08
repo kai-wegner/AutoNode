@@ -56,7 +56,7 @@ exports.functions = {
                 socket: socket
             }
 
-            var eventType = "new" + communicationAutoRemote.getCommunicationType();
+            var eventType = "on" + communicationAutoRemote.getCommunicationType();
 
             console.log("Notifying plugins of event " + eventType);
             plugins.notify(eventType, pluginMessage);
@@ -81,6 +81,7 @@ function renderMessages() {
 var socket;
 
 function messageSocket() {
+    console.log("socket");
     var controller = this;
     socket = controller;
 

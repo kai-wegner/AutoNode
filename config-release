@@ -6,7 +6,7 @@ version            : 0.5
 secret             : your-secret-key
 author             : Kai Wegner - see http://github.com/kai-wegner/AutoNode
 
-webSocketURL_client : ws://127.0.0.1:3000
+webSocketURL_client : ws://localhost:3000
 
 autoNode.registerTo.0   : yourAndroidDeviceID
 

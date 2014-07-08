@@ -1,0 +1,26 @@
+
+    :host {
+      display: block;
+      position: relative;
+      padding: 20px;
+      width: 100%;
+    }
+    paper-button.colored {
+      margin-left: 10px;
+      color: #4285f4;
+      fill: #4285f4;
+    }
+
+    paper-button[raisedButton].colored {
+      background: #4285f4;
+      color: #fff;
+    }
+    paper-button[raisedButton].colored.hover:hover {
+      background: #3367d6;
+    }
+    paper-button[raisedButton].colored::shadow #ripple {
+      color: #2a56c6;
+    }
+    paper-button[raisedButton].colored::shadow #focusBg {
+      background: #3367d6;
+    }

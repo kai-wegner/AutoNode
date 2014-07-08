@@ -1,0 +1,145 @@
+﻿<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link href="../bower_components/font-roboto/roboto.html" rel="import">
+<link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
+
+<polymer-element name="device-item" attributes="device">
+<template>
+  <style>
+    :host {
+      display: block;
+      position: relative;
+      padding: 20px;
+      margin: 50px;
+      width: 400px;
+    }
+    core-header-panel{
+      float: left;
+      width: 400px;
+      height: 300px;
+      margin: 5px;
+    }
+    core-toolbar{
+      height: 60px;
+      font-size: 18px;
+      padding: 0 10px;
+      background-color: #4F7DC9;
+      color: #FFF;
+      transition: height 0.2s;
+    }
+    paper-button.colored {
+      margin-left: 10px;
+      color: #4285f4;
+      fill: #4285f4;
+    }
+
+    paper-button[raisedButton].colored {
+      background: #4285f4;
+      color: #fff;
+    }
+    paper-button[raisedButton].colored.hover:hover {
+      background: #3367d6;
+    }
+    paper-button[raisedButton].colored::shadow #ripple {
+      color: #2a56c6;
+    }
+    paper-button[raisedButton].colored::shadow #focusBg {
+      background: #3367d6;
+    }
+    paper-input{
+      width: 100%;
+    }
+    paper-dialog{
+      width: 500px;
+    }
+    .content{
+      margin-top: 30px;
+    }
+    #typeIcon{
+      width: 60px;
+    }
+  </style>
+  <core-ajax url="/devices/delete" method='POST' id="deleteRequest" contentType="application/json" handleAs="json" on-core-response="{{handleDeleteReponse}}"></core-ajax>  
+  <core-ajax url="/devices/update" method='POST' id="updateRequest" contentType="application/json" handleAs="json"></core-ajax>  
+  <core-ajax url="/devices/sendMessage" method='POST' id="sendMessageRequest" contentType="application/json" handleAs="json" on-core-response="{{handleSendCommunicationReponse}}"></core-ajax> 
+  <core-ajax url="/devices/sendRegistration" method='POST' id="sendRegistrationRequest" contentType="application/json" handleAs="json" on-core-response="{{handleSendCommunicationReponse}}"></core-ajax>  
+  <paper-dialog heading="Sending a message to {{device.name}}" id="sendMessageDialog" transition="paper-dialog-transition-bottom">
+    <paper-input id="inputMessageText" label="Message Text" floatingLabel></paper-input>
+    <paper-button label="OK" affirmative on-tap="{{sendMessage}}"></paper-button>
+    <paper-button label="Cancel" dismissive></paper-button>
+  </paper-dialog>
+  <paper-shadow z="5">
+    <core-header-panel>
+      <core-toolbar>
+        <img src="images/{{device.type}}.png" id="typeIcon"/>
+        <paper-input label="Device Name" value="{{device.name}}" on-change="{{handleChange}}"></paper-input>
+        <paper-icon-button icon="delete" on-tap="{{deleteDevice}}"></paper-icon-button>
+      </core-toolbar>
+      <div class="content" layout vertical center>
+        <paper-input label="Local IP Address" value="{{device.localip}}" floatingLabel on-change="{{handleChange}}"></paper-input>
+        <paper-input label="Port" value="{{device.port}}" floatingLabel on-change="{{handleChange}}"></paper-input>
+        <div layout horizontal center>
+          <paper-button raisedButton class="colored" label="Send Message" on-tap="{{showSendMessageDialog}}"></paper-button>
+          <paper-button raisedButton class="colored" label="Register AutoNode on Device" on-tap="{{registerOnDevice}}"></paper-button>
+        </div>
+      </div>
+    </core-header-panel>
+  </paper-shadow>
+
+<content></content>
+
+</template>
+<script>
+  Polymer('device-item', {
+      publish: {
+        device: null
+      },
+      created: function() {
+        this.device = {};
+      },
+      deleteDevice : function(){
+        this.$.deleteRequest.body = JSON.stringify(this.device);
+        this.$.deleteRequest.go();
+      },
+      handleDeleteReponse : function(event,detail,sender){
+        if(detail.response.success){
+          console.log(this.device.name + " deleted successfully");
+          this.fire("changed");
+          this.updateStatus("Device Deleted","ok");
+        }
+      },
+      handleChange : function(){     
+        this.$.updateRequest.body = JSON.stringify(this.device);
+        this.$.updateRequest.go();
+      },
+      showSendMessageDialog : function(){  
+        this.$.sendMessageDialog.toggle();
+      },
+      sendMessage : function(){     
+        var messageText = this.$.inputMessageText.value;
+        console.log("Sending " + messageText);
+        this.$.sendMessageRequest.body = JSON.stringify({"device" : this.device, "message":{"text": messageText}});
+        this.$.sendMessageRequest.go();
+        this.updateStatus("Sending Message","pending");
+      },
+      handleSendCommunicationReponse : function(event,detail,sender){
+        var result = detail.response.result;
+        this.updateStatus(result.text, result.status);
+      },
+      updateStatus : function(text, status){
+          this.fire("status-update",{"text":text,"status":status});
+      },
+      registerOnDevice : function(){
+        this.$.sendRegistrationRequest.body = JSON.stringify(this.device);
+        this.$.sendRegistrationRequest.go();
+      }
+    });
+</script>
+</polymer-element>

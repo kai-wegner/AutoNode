@@ -25,7 +25,7 @@ var processCommunication = function(event, funcGetContent) {
     }
     return newMessage;
 }
-exports.newRequestSendRegistration = function(event) {
+exports.onRequestSendRegistration = function(event) {
     var communication = event.message;
     var newDevice = event.framework.model('device').new();
     newDevice.id = communication.id;
@@ -43,5 +43,8 @@ exports.newRequestSendRegistration = function(event) {
         db.insert(newDevice);
         console.log("Inserted new device: ");
         console.log(newDevice);
+        if (event.socket != null) {
+            event.socket.send(JSON.stringify(newDevice));
+        }
     });
 };

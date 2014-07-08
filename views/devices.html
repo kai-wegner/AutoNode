@@ -1,152 +1,27 @@
-@{meta('title', 'description', 'keywords')}
-
-<a href="/">&lt; AutoNode</a> - Your devices
-
-<div class="spacer"></div>
-<table id="list"><tr><td></td></tr></table>
-<div id="pager"></div>
-<button id="deleteSelected">Delete selected</button>
-<br/>
-<br/>
-Add New Device
-<br/>
-Personal URL:<input type="text" id="devicePersonalUrl"/>
-Name:<input type="text" id="deviceName"/>
-<input type="button" value="Add Device" onclick="addDevice();" />
-
-<script type="text/javascript">
-
-jQuery.jgrid.no_legacy_api = true;
-
-  function addDevice(){
-    var shortUrl = $("#devicePersonalUrl")[0].value;
-    var name = $("#deviceName")[0].value;
-    var url = "https://www.googleapis.com/urlshortener/v1/url?shortUrl=" + shortUrl;
-    $.ajax({
-      type: 'POST',
-      contentType: 'application/json',
-      url: '/devices/getkey',
-      data: JSON.stringify({
-       "shortUrl":shortUrl
-      }),
-      success: function(data) {
-        console.log("Found key: " + data.key);
-        $.ajax({
-          type: 'POST',
-          contentType: 'application/json',
-          url: '/devices/add',
-          data: JSON.stringify({
-           "key":data.key,
-           "name":name
-          }),
-          success: function(data) {
-            if(data.result){
-              console.log(name + " added");
-              $("#list").trigger('reloadGrid');
-            }else{
-              console.log(name + " couldn't be added");
-            }
-          },
-          dataType: 'json'
-        });
-      },
-      dataType: 'json'
-    });
+<!DOCTYPE html>
+<html>
+  <head>
+  <style type="text/css">
+  core-header-panel{
+  	float: left;
+	width: 100%;
+	height: 400px;
+	margin: 5px;
   }
-$(function () {
-
-  function checkBoxCreator(value, options) {
-    console.log(options);
-    console.log(value);
-
-    var el = document.createElement("input");
-    el.type="checkbox";
-    el.value = value;
-
-    return el;
-  };
-  function checkBoxValueCreator(elem, operation, value) {
-    if(operation === 'get') {
-       return $(elem).val();
-    } else if(operation === 'set') {
-       $('input',elem).val(value);
-    }
-  };
-
-  $("#list").jqGrid({
-    url: "/devices/list",
-    datatype: "json",
-    mtype: "GET",
-    colNames: ["Key","Name", "Type", "Local IP", "Public IP", "Port"],
-    multiselect:true,
-    colModel: [
-        { name:'id',
-          index:'id',
-          width:30,
-          hidden:true,
-          align: "center",
-          sortable:false
-        },
-        { name: "name", width: 150, sortable:false },
-        { name: "type", width: 80,align: "center" },
-        { name: "localip", width: 60,align: "center" },
-        { name: "publicip", width: 60, align: "center" },
-        { name: "port", width: 60, align: "center" }
-    ],
-    pager: "#pager",
-    rowNum: 10,
-    rowList: [10, 20, 30],
-    sortname: "name",
-    sortorder: "asc",
-    viewrecords: true,
-    gridview: true,
-    autoencode: true,
-    caption: "AutoNode Devices"
-  });
-  
-});
-  $("#deleteSelected").click(function(event) {
-    $.ajax({
-      type: 'POST',
-      url: '/devices/delete',
-      data: {
-        delete: $("#list").getGridParam('selarrrow')
-      },
-      success: function(server) {
-        console.log("success");
-        $("#list").trigger('reloadGrid');
-      },
-      dataType: 'json'
-    });
-
-  });
-</script>
-
-<script type="text/javascript">
-
-  var socket = null;
-
-  $(document).ready(function() {
-
-    function connect() {
-
-      if (socket !== null)
-        return;
-
-      socket = new WebSocket('@{model.webSocketURL_client}');
-
-      socket.onopen = function() {
-          console.log('connected to @{model.webSocketURL_client}');
-      };
-
-      socket.onmessage = function(e) {
-        $("#list").trigger('reloadGrid');
-      };
-
-      socket.onclose = function() {
-          console.log('close');
-      };
-    }
-    connect();
-  });
-</script>
+  core-toolbar{
+  	height: 60px;
+	line-height: 60px;
+	font-size: 18px;
+	padding: 0 10px;
+	background-color: #4F7DC9;
+	color: #FFF;
+	transition: height 0.2s;
+  }
+  </style>
+    <script src="bower_components/platform/platform.js"></script>
+    <link rel="import" href="AutoNode_components/devices-control.html">
+  </head>
+  <body>
+	<devices-control websocketServer="@{model.webSocketURL_client}"></devices-control>
+  </body>
+</html>

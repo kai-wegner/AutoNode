@@ -17,7 +17,7 @@ exports.init = function(configuration) {
 };
 
 
-exports.newMessage = function(event) {
+exports.onMessage = function(event) {
     if (event.message.message.indexOf('$:') == 0) {
         var command = event.message.message.substring(2);
         var registeredDevices = this.registeredDevices;
@@ -31,10 +31,15 @@ exports.newMessage = function(event) {
                 response = error;
             }
             var db = framework.database('devices');
+            console.log("Sender in simpleShell: " + event.message.sender);
             var device = db.one(function(device) {
                 return device.id == event.message.sender;
             }, function(device) {
-                autoRemote.sendMessageToDevice(device, "shell=:=" + response);
+                if (device != null) {
+                    autoRemote.sendMessageToDevice(device, "shell=:=" + response);
+                } else {
+                    console.log("Can't respond with command result. Device doesn't exist.");
+                }
             });
 
 

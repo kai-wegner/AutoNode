@@ -68,8 +68,11 @@ function view_homepage() {
 
     if (self.get.message != null || self.post.message != null)
         messages.processMessage(self);
-    else
-        self.view('homepage');
+    else {
+        self.view('homepage', {
+            webSocketURL_client: framework.config.webSocketURL_client
+        });
+    }
 }
 
 function processMessage() {

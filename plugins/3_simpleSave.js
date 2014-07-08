@@ -27,12 +27,12 @@ var processCommunication = function(event, funcGetContent) {
     }
     return newMessage;
 }
-exports.newMessage = function(event) {
+exports.onMessage = function(event) {
     processCommunication(event, function(communication) {
         return communication.message
     })
 };
-exports.newNotification = function(event) {
+exports.onNotification = function(event) {
     processCommunication(event, function(communication) {
         return communication.title + " - " + communication.text;
     })

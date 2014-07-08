@@ -1,0 +1,141 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog-transition.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="device-list.html">
+<link rel="import" href="message-list.html">
+
+<polymer-element name="devices-control" attributes="websocketServer show">
+  <template>
+    <style type="text/css">
+    core-header-panel{
+    	float: left;
+    	width: 100%;
+    	height: 700px;
+    	margin: 5px;
+    }
+    core-toolbar{
+    	height: 60px;
+    	line-height: 60px;
+    	font-size: 18px;
+    	padding: 0 10px;
+    	background-color: #4F7DC9;
+    	color: #FFF;
+    	transition: height 0.2s;
+    }
+    paper-dialog{
+      width: 500px;
+    }
+    paper-input{
+      width: 100%;
+    }
+    paper-toast.ok{
+      background-color: green;
+    }
+    paper-toast.error{
+      background-color: red;
+    }
+    paper-toast.pending{
+      background-color: #CCCC00;
+    }
+    </style> 
+    <core-ajax url="/devices/addFromId" method='POST' id="insertRequest" contentType="application/json" handleAs="json" on-core-response="{{handleDeviceAdded}}"></core-ajax> 
+    <paper-toast id="toast" class="capsule" duration="6000" style="padding-right: 60px;"></paper-toast> 
+    <paper-dialog heading="New Device" id="addDialog" transition="paper-dialog-transition-bottom">
+      <paper-input id="inputNewDevice" label="Device personal URL or Local IP Address and port (address:port)" floatingLabel></paper-input>      
+      <paper-button label="OK" affirmative on-tap="{{addDevice}}"></paper-button>
+      <paper-button label="Cancel" dismissive></paper-button>
+    </paper-dialog>
+  	<core-header-panel mode="waterfall">
+    		<core-toolbar>
+          <span flex>AutoNode Devices</span>
+          <paper-icon-button icon="add-box" on-click="{{showAddDeviceDialog}}"></paper-icon-button>
+        </core-toolbar>
+      		<div>
+      			<device-list id="deviceList" on-status-update="{{statusUpdated}}">
+      			</device-list>			
+      		</div>
+    </core-header-panel>
+  </template>
+  <script> 
+  Polymer('devices-control', {
+    publish: {
+    },
+    addDevice: function(){
+      var id= this.$.inputNewDevice.value;
+      console.log("Inserting: " + id);
+      this.$.insertRequest.body = JSON.stringify({"id":id});
+      this.$.insertRequest.go();
+      this.showToast("Inserting device...");
+    },
+    showAddDeviceDialog: function(){
+      this.$.addDialog.toggle();
+    },
+    handleDeviceAdded: function(event, details){
+      var result = details.response.result;
+      var toastText = null;
+      if(result.status == "ok"){
+        toastText = "Device Inserted.";
+        this.$.deviceList.refreshList();
+      }else if(result.status == "pending"){        
+        this.$.deviceList.refreshList();
+      }{
+        toastText = result.text;
+      }
+      this.showToast(toastText,result.status);
+      
+    },
+    showToast: function(text, status){      
+      this.$.toast.text = text;
+      for (var i = 0; i < this.statuses.length; i++) {
+        var statusToRemove = this.statuses[i];
+        this.$.toast.classList.remove(statusToRemove);
+      };
+      if(status != null){
+        this.$.toast.classList.add(status);
+      }
+      this.$.toast.show();
+    },
+    statuses: ["ok","error","pending"],
+    statusUpdated : function(event,detail){
+      this.showToast(detail.text,detail.status);
+    },
+    created: function() {
+      
+    },
+    websocketServerChanged: function(oldValue, newValue) {
+      var me = this;
+      var socket = null;
+      console.log(newValue);
+      function connect() {
+
+        if (socket !== null)
+          return;
+        var url = me.websocketServer;
+        console.log("websocketServer: " + url);
+        socket = new WebSocket(url);
+
+        socket.onopen = function() {
+          console.log('connected to ' + url);
+        };
+
+        socket.onmessage = function(e) {
+          me.$.deviceList.refreshList();
+        };
+
+        socket.onclose = function() {
+          console.log('close');
+        };
+      }
+      connect();
+    }
+});
+  </script>
+
+</polymer-element>
