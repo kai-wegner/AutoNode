@@ -14,10 +14,14 @@ exports.install = function(framework) {
 
     framework.autoNode = config2json.parseConfig('autoNode', framework.config).autoNode;
 
-    for (var i = 0; i < framework.autoNode.registerTo.length; i++)
-        arcomm.registerServerToDevice(null, {
-            key: framework.autoNode.registerTo[i]
-        });
+
+    var db = framework.database('devices');
+    db.all(function(devices) {
+        for (var i = 0; i < devices.length; i++) {
+            var device = devices[i];
+            arcomm.registerServerToDevice(null, device);
+        };
+    });
 
     plugins.init({
         autoRemote: arcomm,
@@ -31,28 +35,38 @@ exports.functions = {
     processMessage: function(controller) {
         var communicationAutoRemote = arcomm.getCommunicationFromPayload(controller.post);
 
-        var response = communicationAutoRemote.executeRequest();
+        var db = framework.database('devices');
+        var device = db.one(function(device) {
+            return device.id == communicationAutoRemote.sender;
+        }, function(device) {
+            if (device != null) {
+                console.log("Found device for message: " + device.name);
+                communicationAutoRemote.device = device;
+            }
+            var response = communicationAutoRemote.executeRequest();
 
-        var pluginMessage = {
-            query: controller.post,
-            request: controller.req,
-            message: communicationAutoRemote,
-            sender: communicationAutoRemote.sender,
-            callchain: [],
-            responses: [],
-            framework: controller,
-            socket: socket
-        }
+            var pluginMessage = {
+                query: controller.post,
+                request: controller.req,
+                message: communicationAutoRemote,
+                sender: communicationAutoRemote.sender,
+                callchain: [],
+                responses: [],
+                framework: controller,
+                socket: socket
+            }
 
-        var eventType = "new" + communicationAutoRemote.getCommunicationType();
+            var eventType = "new" + communicationAutoRemote.getCommunicationType();
 
-        console.log("Notifying plugins of event " + eventType);
-        plugins.notify(eventType, pluginMessage);
+            console.log("Notifying plugins of event " + eventType);
+            plugins.notify(eventType, pluginMessage);
 
-        plugins.notify("done", pluginMessage);
+            plugins.notify("done", pluginMessage);
 
-        var responseText = JSON.stringify(response);
-        controller.plain(response);
+            var responseText = JSON.stringify(response);
+            controller.plain(response);
+        });
+
     }
 };
 

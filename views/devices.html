@@ -5,14 +5,56 @@
 <div class="spacer"></div>
 <table id="list"><tr><td></td></tr></table>
 <div id="pager"></div>
-
 <button id="deleteSelected">Delete selected</button>
+<br/>
+<br/>
+Add New Device
+<br/>
+Personal URL:<input type="text" id="devicePersonalUrl"/>
+Name:<input type="text" id="deviceName"/>
+<input type="button" value="Add Device" onclick="addDevice();" />
 
 <script type="text/javascript">
+
 jQuery.jgrid.no_legacy_api = true;
 
-
+  function addDevice(){
+    var shortUrl = $("#devicePersonalUrl")[0].value;
+    var name = $("#deviceName")[0].value;
+    var url = "https://www.googleapis.com/urlshortener/v1/url?shortUrl=" + shortUrl;
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json',
+      url: '/devices/getkey',
+      data: JSON.stringify({
+       "shortUrl":shortUrl
+      }),
+      success: function(data) {
+        console.log("Found key: " + data.key);
+        $.ajax({
+          type: 'POST',
+          contentType: 'application/json',
+          url: '/devices/add',
+          data: JSON.stringify({
+           "key":data.key,
+           "name":name
+          }),
+          success: function(data) {
+            if(data.result){
+              console.log(name + " added");
+              $("#list").trigger('reloadGrid');
+            }else{
+              console.log(name + " couldn't be added");
+            }
+          },
+          dataType: 'json'
+        });
+      },
+      dataType: 'json'
+    });
+  }
 $(function () {
+
   function checkBoxCreator(value, options) {
     console.log(options);
     console.log(value);
@@ -61,22 +103,23 @@ $(function () {
     autoencode: true,
     caption: "AutoNode Devices"
   });
+  
+});
   $("#deleteSelected").click(function(event) {
     $.ajax({
       type: 'POST',
-      url: '/messages/delete',
+      url: '/devices/delete',
       data: {
         delete: $("#list").getGridParam('selarrrow')
       },
       success: function(server) {
-        console.log("success")
+        console.log("success");
+        $("#list").trigger('reloadGrid');
       },
       dataType: 'json'
     });
 
-    $("#list").trigger('reloadGrid');
   });
-});
 </script>
 
 <script type="text/javascript">

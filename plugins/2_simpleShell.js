@@ -7,9 +7,11 @@ exports.meta = {
 
 var autoRemote;
 var registeredDevices;
+var framework;
 exports.init = function(configuration) {
     this.autoRemote = configuration.autoRemote;
     this.registeredDevices = configuration.registeredDevices;
+    framework = configuration.framework;
 
     console.log(this.meta.name + " loaded! (" + (this.meta.enabled || this.meta.enabled == null ? 'enabled' : 'disabled') + ")");
 };
@@ -28,9 +30,12 @@ exports.newMessage = function(event) {
                 console.log('exec error: ' + error);
                 response = error;
             }
-            autoRemote.sendMessageToDevice({
-                key: event.message.sender
-            }, response);
+            var db = framework.database('devices');
+            var device = db.one(function(device) {
+                return device.id == event.message.sender;
+            }, function(device) {
+                autoRemote.sendMessageToDevice(device, "shell=:=" + response);
+            });
 
 
         });
