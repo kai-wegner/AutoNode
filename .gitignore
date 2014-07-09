@@ -3,7 +3,4 @@ debug.js
 debug.pid
 databases/
 node_modules/
-tmp/css-default.css
-tmp/css-ui.jqgrid.css
-tmp/js-default.js
-tmp/js-i18n-grid.locale-en.js
+tmp/
