@@ -1,7 +1,7 @@
 {
   "name": "autoremoteserver",
   "description": "A cross-plattform AutoRemote-Server based on node.js (AutoNode)",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": false,
   "author": "Kai Wegner",
   "repository": {
@@ -14,7 +14,7 @@
   },
   "config" : { "port" : "1337" },
   "scripts": {
-    "postinstall": "mv node_modules/* ../../node_modules && rm -rf node_modules && mv * ../.. && mkdir ../../logs && cd ../.. && npm start",
+    "postinstall": "cd .. && mv autoremoteserver .. && mv ../autoremoteserver/node_modules/* . && rm -rf ../autoremoteserver/node_modules && mv ../autoremoteserver/* .. && mkdir ../logs && cd .. && rm -rf autoremoteserver && npm start",
     "start": "node_modules/forever/bin/forever start --silent -p . -m 1 -a -l logs/AutoNode.log -o logs/AutoNode.log -e logs/AutoNode.log --pidFile AutoNode.pid --uid 'AutoNode' --minUptime 1000 --spinSleepTime 1000 server.js",
     "stop": "node_modules/forever/bin/forever stop AutoNode"
   },
