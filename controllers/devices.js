@@ -15,8 +15,9 @@ exports.install = function(framework) {
     framework.route('/devices/sendMessage', sendMessage, ['json']);
     framework.route('/devices/sendRegistration', sendRegistration, ['json']);
 
-    arcomm.setConfig(config2json.parseConfig('autoRemote', framework.config));
-
+    var initialConfig = config2json.parseConfig('autoRemote', framework.config);
+    arcomm.setConfig(initialConfig.autoRemote);
+    arcomm.resolveConfig(initialConfig.autoRemote.interfaces);
 };
 
 function renderDevices() {

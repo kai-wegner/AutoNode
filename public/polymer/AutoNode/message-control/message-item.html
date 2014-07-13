@@ -1,0 +1,35 @@
+﻿<polymer-element name="message-item" attributes="message">
+<template>
+    <link type="text/css" rel="stylesheet" href="item.css">
+    <style>
+    </style>
+
+    <core-ajax url="/messages/delete" handleAs="json" id="deleteRequest" on-core-response="{{handleDeleteRequest}}" response="{{messages}}"></core-ajax>
+    <core-icon-button on-click="{{toggle}}" icon="arrow-drop-down"></core-icon-button>Show Details
+
+    <core-collapse id="collapse">
+        <div class="core-header" layout vertical left>
+          <paper-input label="Sender" value="{{message.sender}}" disabled floatingLabel></paper-input>
+          <paper-input label="Direction" value="{{message.direction}}" disabled floatingLabel></paper-input>
+          <paper-input label="Type" value="{{message.type}}" disabled floatingLabel></paper-input>
+          <paper-input label="Received" value="{{message.received}}" disabled floatingLabel></paper-input>
+        </div>
+    </core-collapse>
+
+    <div class="content" layout horizontal center>
+      <content><h2>{{message.content}}<h2></content>
+    </div>
+
+    <div class="item" layout horizontal center>
+        <paper-icon-button icon="delete" on-tap="{{deleteDevice}}"></paper-icon-button>
+        <paper-button raisedButton class="colored" label="Reply"></paper-button>
+    </div>
+</template>
+<script>
+  Polymer({
+    toggle: function() {
+        this.$.collapse.toggle();
+    }
+  });
+</script>
+</polymer-element>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     @{meta}
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
@@ -9,22 +9,39 @@
     <meta name="robots" content="all,follow" />
     @{head}
     @{css('default.css')}
-    <script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
-    @{js('default.js')}
     @{favicon('favicon.ico')}
-    <!-- jqGrid -->
-    <link rel="stylesheet" type="text/css" media="screen" href="/css/flick/jquery-ui-1.10.4.custom.min.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="/css/ui.jqgrid.css" />
+    <script src="polymer/dist/platform/platform.js"></script>
+    <!-- Core compoentens -->
+    <link rel="import" href="polymer/dist/polymer/polymer.html">
 
-    <script src="/js/i18n/grid.locale-en.js" type="text/javascript"></script>
-    <script src="/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+    <link rel="import" href="polymer/dist/core-ajax/core-ajax.html">
+    <link rel="import" href="polymer/dist/core-icons/core-icons.html">
+    <link rel="import" href="polymer/dist/core-icon-button/core-icon-button.html">
+    <link rel="import" href="polymer/dist/core-toolbar/core-toolbar.html">
+    <link rel="import" href="polymer/dist/core-animated-pages/core-animated-pages.html">
+    <link rel="import" href="polymer/dist/core-animated-pages/transitions/slide-from-right.html">
+    <link rel="import" href="polymer/dist/core-header-panel/core-header-panel.html">
+    <link rel="import" href="polymer/dist/core-collapse/core-collapse.html">
+    <link rel="import" href="polymer/dist/core-list/core-list.html">
 
+    <!-- Paper stuff -->
+    <link rel="import" href="polymer/dist/paper-shadow/paper-shadow.html" >
+    <link rel="import" href="polymer/dist/paper-button/paper-button.html">
+    <link rel="import" href="polymer/dist/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="polymer/dist/paper-tabs/paper-tabs.html">
+    <link rel="import" href="polymer/dist/paper-dialog/paper-dialog.html">
+    <link rel="import" href="polymer/dist/paper-dialog/paper-dialog-transition.html">
+    <link rel="import" href="polymer/dist/paper-input/paper-input.html">
+    <link rel="import" href="polymer/dist/paper-toast/paper-toast.html">
 
+    <!-- Other -->
+    <link rel="import" href="polymer/dist/font-roboto/roboto.html">
 
-</head>
-<body>
-
+    <!-- Self defined -->
+    <link rel="import" href="polymer/AutoNode/devices-control/devices-control.html">
+    <link rel="import" href="polymer/AutoNode/message-control/message-control.html">
+    </head>
+  <body>
     @{body}
-
-</body>
+  </body>
 </html>

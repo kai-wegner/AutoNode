@@ -1,0 +1,34 @@
+﻿<link rel="import" href="message-item.html">
+
+<polymer-element name="message-list" attributes="show">
+<template>
+    <link type="text/css" rel="stylesheet" href="list.css">
+  <style>
+    post-card {
+      margin-bottom: 30px;
+    }
+  </style>
+  <core-ajax id="requestMessages" url="/messages/list" handleAs="json" auto response="{{messages}}"></core-ajax>
+  <core-list data="{{messages}}" height="80">
+    <paper-shadow z="5">
+      <div class="list" layout vertical center>
+        <template repeat="{{message in messages}}">
+          <message-item message="{{message}}"></message-item>
+        </template>
+      </div>
+    </paper-shadow>
+  </core-list>
+</template>
+
+<script>
+Polymer({
+      refreshList : function() {
+        this.$.requestMessages.go();
+      },
+      statusUpdated : function(event,detail) {
+          this.fire(event.type,detail);
+      }
+});
+</script>
+
+</polymer-element>

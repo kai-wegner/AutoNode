@@ -10,10 +10,14 @@ exports.install = function(framework) {
     framework.route('/messages/delete', deleteMessages, ['post']);
     framework.websocket('/', messageSocket, ['json']);
 
-    arcomm.setConfig(config2json.parseConfig('autoRemote', framework.config));
+    var initialConfig = config2json.parseConfig('autoRemote', framework.config);
+    arcomm.setConfig(initialConfig.autoRemote);
+    arcomm.resolveConfig(function(config){
+        console.log("Using public ip: "+config.interfaces.public.ip)
+        console.log("Using local ip: "+config.interfaces.local.ip)
+    });
 
     framework.autoNode = config2json.parseConfig('autoNode', framework.config).autoNode;
-
 
     var db = framework.database('devices');
     db.all(function(devices) {

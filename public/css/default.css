@@ -3,10 +3,50 @@
 @constant{ color:#505050 }
 @function(property){ color:@property }
 
-body { padding:20px; margin:0; font:normal 12px Arial; @constant; }
+body { padding:0px; margin:0; font:normal 12px Arial; @constant; }
 div { @function('red'); }
 
 .spacer {
   margin-top:10px;
   padding-top:10px;
+}
+
+.margin {
+  margin-left:20px;
+}
+
+
+core-header-panel{
+  float: left;
+  width: 100%;
+  height: 400px;
+  margin: 5px;
+}
+core-toolbar{
+  height: 60px;
+  line-height: 60px;
+  font-size: 18px;
+  padding: 0 10px;
+  background-color: #4F7DC9;
+  color: #FFF;
+  transition: height 0.2s;
+}
+
+.core-header {
+  height: 60px;
+  line-height: 60px;
+  font-size: 18px;
+  padding: 0 10px;
+  background-color: #4F7DC9;
+  color: #FFF;
+  transition: height 0.2s;
+}
+
+.core-header.tall {
+  height: 180px;
+}
+
+
+paper-tabs.red::shadow #selectionBar {
+  background-color: #cc0000;
 }

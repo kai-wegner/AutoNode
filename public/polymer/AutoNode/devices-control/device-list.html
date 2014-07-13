@@ -1,0 +1,27 @@
+﻿<link rel="import" href="device-item.html">
+
+<polymer-element name="device-list" attributes="show">
+<template>
+  <style>
+  </style>
+  <core-ajax url="/devices/list" handleAs="json" auto response="{{devices}}" id="requestDevices" ></core-ajax>
+    <div class="list" layout horizontal center>
+      <template repeat="{{device in devices}}">
+        <device-item device="{{device}}" on-changed="{{refreshList}}" on-status-update="{{statusUpdated}}">
+        </device-item>
+      </template>
+    </div>
+</template>
+
+<script>
+Polymer({
+      refreshList : function(){
+        this.$.requestDevices.go();
+      },
+      statusUpdated : function(event,detail){
+          this.fire(event.type,detail);
+      }
+});
+</script>
+
+</polymer-element>

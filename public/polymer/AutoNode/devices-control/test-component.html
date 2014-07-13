@@ -1,0 +1,17 @@
+﻿<polymer-element name="test-component" attributes="show">
+<template>
+  <h2>{{show}}</h2>
+</template>
+
+<script>
+Polymer({
+      created : function(){
+
+      },
+      showChanged: function(oldValue, newValue) {
+        console.log("show: " + newValue);
+      }
+});
+</script>
+
+</polymer-element>

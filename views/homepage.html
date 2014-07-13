@@ -1,11 +1,50 @@
 @{meta('title', 'description', 'keywords')}
 
+<core-toolbar class="medium-tall">
+
+  <!--<paper-icon-button id="navicon" icon="menu"></paper-icon-button>-->
+
+  <span flex>Welcome to <span style="font-size:1.5em">AutoNode</span></span>
+
+  <!--<paper-icon-button id="morebutton" icon="more-vert"></paper-icon-button>-->
+
+  <paper-tabs id="tabs" class="bottom fit red" selected="0">
+    <paper-tab>Messages</paper-tab>
+    <paper-tab>Devices</paper-tab>
+    <paper-tab>Events</paper-tab>
+    <paper-tab>Analyse</paper-tab>
+  <paper-tabs>
+</core-toolbar>
+
+<core-animated-pages id="pages" transitions="slide-from-right">
+  <section>
+    <message-control websocketServer="@{model.webSocketURL_client}"></message-control>
+  </section>
+  <section>
+    <devices-control websocketServer="@{model.webSocketURL_client}"></devices-control>
+  </section>
+  <section class="margin">
+    <h3>Events - TBD</h3>
+  </section>
+  <section class="margin">
+    <h3>Analyse - TBD</h3>
+  </section>
+</core-animated-pages>
+
+<script>
+      var tabs = document.querySelector('#tabs');
+      tabs.addEventListener("core-select", function(event) {
+        var pages = document.querySelector('#pages');
+        pages.selected = tabs.selected;
+      });
+</script>
+
+<!--
 <h2>Welcome to AutoNode!</h2>
 <ul>
   <li class=""><a href="/messages">Track and Manage your messages</a></li>
   <li class=""><a href="/devices">See your registered devices</a></li>
-  <!--
   <li class=""><a href="/events">Create events</a></li>
   <li class=""><a href="/analyse">Analyse your data</a></li>
-  -->
 </ul>
+-->
