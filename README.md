@@ -25,3 +25,9 @@
 
   Check out the "config-release" file and set your device-ID.
   This is necessary to talk back to your device. It will register this server to those devices also.
+
+# License
+The MIT License (MIT)
+
+Copyright (c) 2015 Kai Wegner
+
